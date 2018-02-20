@@ -5,7 +5,7 @@ forked from https://github.com/melix/teamcity-groovy-buildstep
 
 ### download 
 
-get in [releases the teamgroovy.zip](./releases)
+get in [releases the teamgroovy.zip](https://github.com/dlukyanov/teamgroovy/releases)
 
 ### install
 
