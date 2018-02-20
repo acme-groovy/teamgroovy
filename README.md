@@ -63,7 +63,6 @@ more AntBuilder examples see here: http://docs.groovy-lang.org/latest/html/docum
 ### write all env variables to json
 
 ```groovy
-new groovy.json.JsonBuilder( env ).
 new File("${myOutputDir}/env.json").withWriter{ w->
   new groovy.json.JsonBuilder( env ).writeTo( w )
 }
