@@ -9,9 +9,9 @@ get in [releases the teamgroovy.zip](https://github.com/dlukyanov/teamgroovy/rel
 
 ### install
 
-For TeamCity 2017 just upload the `teamgroovy.zip` from the `Administration | Plugins List` menu.
+In TeamCity 2017 just upload the `teamgroovy.zip` from the `Administration | Plugins List` menu.
 
-https://confluence.jetbrains.com/display/TCD10/Installing+Additional+Plugins
+For more info see: https://confluence.jetbrains.com/display/TCD10/Installing+Additional+Plugins
 
 ### main changes from original:
 
