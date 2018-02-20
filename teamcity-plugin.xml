@@ -4,12 +4,12 @@
     <name>teamgroovy</name>
     <display-name>teamgroovy</display-name>
     <version>@Version@</version>
-    <description>Plugin description</description>
-    <download-url>Plugin download URL</download-url>
-    <email>Plugin author e-mail</email>
+    <description>Groovy script as a build step (teamgroovy)</description>
+    <download-url>https://github.com/dlukyanov/teamgroovy/releases</download-url>
+    <email>dlukyanov@ukr.net</email>
     <vendor>
-      <name>@VendorName@</name>
-      <url>@VendorURL@</url>
+      <name>dlukyanov@ukr.net</name>
+      <url>https://github.com/dlukyanov/teamgroovy/releases</url>
       <logo>Plugin vendor logo URL</logo>
     </vendor>
   </info>

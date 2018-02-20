@@ -22,9 +22,68 @@
     <span class="error" id="error_script.content"></span>
   </td>
 </tr>
+<tr>
+  <th>
+    <label>Variables available in groovy script:</label>
+  </th>
+  <td>
+  	<table border="0">
+  		<tr>
+  		<th>name</th><th>type</th><th>comment</th>
+  		</tr>
+  		<tr>
+			<td>system</td>
+			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a></td>
+			<td>system properties</td>
+  		</tr>
+  		<tr>
+			<td>env</td>
+			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a></td>
+			<td>environment variables</td>
+  		</tr>
+  		<tr>
+			<td>configParams</td>
+			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a></td>
+			<td>configuration parameters</td>
+  		</tr>
+  		<tr>
+			<td>params</td>
+			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a></td>
+			<td>all parameters</td>
+  		</tr>
+  		<tr>
+			<td>log</td>
+			<td><a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildProgressLogger.html">jetbrains.buildServer.agent.BuildProgressLogger</a></td>
+			<td>build step logger</td>
+  		</tr>
+  		<tr>
+			<td>agent</td>
+			<td><a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/AgentRunningBuild.html">jetbrains.buildServer.agent.AgentRunningBuild</a></td>
+			<td>Represents running build on the agent side</td>
+  		</tr>
+  		<tr>
+			<td>context</td>
+			<td><a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildRunnerContext.html">jetbrains.buildServer.agent.BuildRunnerContext</a></td>
+			<td>Represents current build runner.</td>
+  		</tr>
+  		<tr>
+			<td>out</td>
+			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/io/PrintStream.html">java.io.PrintStream</a></td>
+			<td>The printstream that redirects output to teamcity build logger. Allows usage of <code>println</code> groovy method.</td>
+  		</tr>
+  		<tr>
+			<td>ant</td>
+			<td><a href="http://docs.groovy-lang.org/latest/html/documentation/ant-builder.html">groovy.util.AntBuilder</a></td>
+			<td>AntBuilder with output redirected to teamcity build logger</td>
+  		</tr>
+  	</table>
+  </td>
+</tr>
+
 <script>
     $j.getScript("${teamcityPluginResourcesPath}codemirror.js")
     .done(function () {
+    	console.log("${teamcityPluginResourcesPath}groovy.js");
         return $j.getScript("${teamcityPluginResourcesPath}groovy.js");
     })
     .done(function () {

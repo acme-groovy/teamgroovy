@@ -42,7 +42,7 @@ public class GroovyRunner implements AgentExtension, AgentBuildRunner, AgentBuil
 
     @Override
     public String getType() {
-        return "Groovy script";
+        return "teamgroovy";
     }
 
     @Override

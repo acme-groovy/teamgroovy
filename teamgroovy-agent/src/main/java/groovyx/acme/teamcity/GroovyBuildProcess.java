@@ -25,88 +25,119 @@ import org.apache.log4j.Logger;
 
 import groovy.lang.Binding;
 import groovy.lang.Script;
+import groovy.util.AntBuilder;
 import groovy.lang.GroovyShell;
+import org.codehaus.groovy.runtime.StackTraceUtils;
+
+//import org.apache.tools.ant.BuildLogger;
+import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.DefaultLogger;
+
+import java.util.List;
+import java.io.PrintStream;
 
 import java.util.concurrent.*;
 
 public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedStatus> {
-    private static final Logger log = Logger.getLogger(GroovyBuildProcess.class);
+	private static final Logger log = Logger.getLogger(GroovyBuildProcess.class);
 
-    private Future<BuildFinishedStatus> buildStatus;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+	private Future<BuildFinishedStatus> buildStatus;
+	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private final AgentRunningBuild agent;
-    private final BuildRunnerContext context;
+	private final AgentRunningBuild agent;
+	private final BuildRunnerContext context;
 
-    public GroovyBuildProcess(final AgentRunningBuild agent, final BuildRunnerContext context) {
-        this.agent = agent;
-        this.context = context;
-    }
+	public GroovyBuildProcess(final AgentRunningBuild agent, final BuildRunnerContext context) {
+		this.agent = agent;
+		this.context = context;
+	}
 
-    @Override
-    public void start() throws RunBuildException {
-        try {
-            buildStatus = executor.submit(this);
-            log.info("Groovy script started");
-        } catch (final RejectedExecutionException e) {
-            log.error("Groovy script failed to start", e);
-            throw new RunBuildException(e);
-        }
-    }
+	@Override
+	public void start() throws RunBuildException {
+		try {
+			buildStatus = executor.submit(this);
+			log.info("Groovy script started");
+		} catch (final RejectedExecutionException e) {
+			log.error("Groovy script failed to start", e);
+			throw new RunBuildException(e);
+		}
+	}
 
-    public boolean isInterrupted() {
-        return buildStatus.isCancelled() && isFinished();
-    }
+	public boolean isInterrupted() {
+		return buildStatus.isCancelled() && isFinished();
+	}
 
-    public boolean isFinished() {
-        return buildStatus.isDone();
-    }
+	public boolean isFinished() {
+		return buildStatus.isDone();
+	}
 
-    public void interrupt() {
-        log.info("Interrupting Groovy script");
-        buildStatus.cancel(true);
-    }
+	public void interrupt() {
+		log.info("Interrupting Groovy script");
+		buildStatus.cancel(true);
+	}
 
-    @Override
-    public BuildFinishedStatus waitFor() throws RunBuildException {
-        try {
-            final BuildFinishedStatus status = buildStatus.get();
-            log.info("Build process was finished");
-            return status;
-        } catch (final InterruptedException e) {
-            throw new RunBuildException(e);
-        } catch (final ExecutionException e) {
-            throw new RunBuildException(e);
-        } catch (final CancellationException e) {
-            log.error("Build process was interrupted: ", e);
-            return BuildFinishedStatus.INTERRUPTED;
-        } finally {
-            executor.shutdown();
-        }
-    }
+	@Override
+	public BuildFinishedStatus waitFor() throws RunBuildException {
+		try {
+			final BuildFinishedStatus status = buildStatus.get();
+			log.info("Build process was finished");
+			return status;
+		} catch (final InterruptedException e) {
+			throw new RunBuildException(e);
+		} catch (final ExecutionException e) {
+			throw new RunBuildException(e);
+		} catch (final CancellationException e) {
+			log.error("Build process was interrupted: ", e);
+			return BuildFinishedStatus.INTERRUPTED;
+		} finally {
+			executor.shutdown();
+		}
+	}
 
-    public BuildFinishedStatus call() {
-        Binding binding = new Binding();
-        binding.setProperty("system", context.getBuildParameters().getSystemProperties());
-        binding.setProperty("env", context.getBuildParameters().getEnvironmentVariables());
-        binding.setProperty("params", context.getBuildParameters().getAllParameters());
-        binding.setProperty("agent", agent);
-        binding.setProperty("configParams", context.getConfigParameters());
-        binding.setProperty("log", agent.getBuildLogger());
-        binding.setProperty("context", context);
+	private AntBuilder getAntBuilder(PrintStream out, PrintStream err){
+		AntBuilder ant = new AntBuilder();
+		//List<BuildListener> listeners = ant.getProject().getBuildListeners();
+		//replace stdout and stderr in default ant logger to redirect output to teamcity
+		for(BuildListener listener : ant.getProject().getBuildListeners()){
+			if(listener instanceof DefaultLogger){
+				DefaultLogger defLogger = (DefaultLogger)listener;
+				defLogger.setOutputPrintStream(out);
+				defLogger.setErrorPrintStream(err);
+			}
+		}
+		return ant;
+	}
 
-        GroovyShell shell = new GroovyShell(binding);
-        Script script = shell.parse(context.getRunnerParameters().get("scriptBody"));
-        try {
-            Object result = script.run();
-            agent.getBuildLogger().message("Script finished with result: $result");
-        } catch (Throwable e) {
-            agent.getBuildLogger().error(e.toString());
-            return BuildFinishedStatus.FINISHED_FAILED;
-        }
 
-        return BuildFinishedStatus.FINISHED_SUCCESS;
-    }
+	public BuildFinishedStatus call() {
+		try {
+			PrintStream out = new PrintStream( new LogStream(agent.getBuildLogger(), LogStream.LEVEL_INFO), true, "UTF-8" );
+			PrintStream err = new PrintStream( new LogStream(agent.getBuildLogger(), LogStream.LEVEL_ERR),  true, "UTF-8" );
+		
+			Binding binding = new Binding();
+			binding.setProperty("system", context.getBuildParameters().getSystemProperties());
+			binding.setProperty("env", context.getBuildParameters().getEnvironmentVariables());
+			binding.setProperty("params", context.getBuildParameters().getAllParameters());
+			binding.setProperty("agent", agent);
+			binding.setProperty("configParams", context.getConfigParameters());
+			binding.setProperty("log", agent.getBuildLogger());
+			binding.setProperty("context", context);
+			binding.setProperty("out", out);
+			binding.setProperty("ant", getAntBuilder( out, err ));
+
+			GroovyShell shell = new GroovyShell(binding);
+			Script script = shell.parse(context.getRunnerParameters().get("scriptBody"));
+			Object result = script.run();
+			agent.getBuildLogger().message("Script finished with result: "+result);
+		} catch (Throwable e) {
+			//agent.getBuildLogger().error(e.toString());
+			agent.getBuildLogger().exception( StackTraceUtils.deepSanitize(e) );
+			return BuildFinishedStatus.FINISHED_FAILED;
+		}
+
+		return BuildFinishedStatus.FINISHED_SUCCESS;
+	}
 
 
 }

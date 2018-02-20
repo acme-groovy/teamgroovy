@@ -39,13 +39,13 @@ public class GroovyRunType extends RunType {
     @NotNull
     @Override
     public String getType() {
-        return "Groovy script";
+        return "teamgroovy";
     }
 
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Groovy script";
+        return "Groovy script (teamgroovy)";
     }
 
     @NotNull
