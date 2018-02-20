@@ -22,9 +22,9 @@
     <span class="error" id="error_script.content"></span>
   </td>
 </tr>
-<tr>
+<tr class="advancedSetting">
   <th>
-    <label>Variables available in groovy script:</label>
+    <label>variables available <br/>in script:</label>
   </th>
   <td>
   	<table border="0">

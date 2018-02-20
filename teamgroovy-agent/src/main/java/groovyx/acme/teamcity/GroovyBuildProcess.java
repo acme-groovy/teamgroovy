@@ -129,7 +129,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 			GroovyShell shell = new GroovyShell(binding);
 			Script script = shell.parse(context.getRunnerParameters().get("scriptBody"));
 			Object result = script.run();
-			agent.getBuildLogger().message("Script finished with result: "+result);
+			agent.getBuildLogger().message("Groovy script: SUCCESS");
 		} catch (Throwable e) {
 			//agent.getBuildLogger().error(e.toString());
 			agent.getBuildLogger().exception( StackTraceUtils.deepSanitize(e) );
