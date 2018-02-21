@@ -37,7 +37,7 @@ For more info see: https://confluence.jetbrains.com/display/TCD10/Installing+Add
 
 ### logging
 
-For messages to appear into the build log, you can use `println` or `log` variable:
+For messages to appear into the build log, you can use `println` groovy function or `log` variable:
 
 ```groovy
 def name = 'world'
