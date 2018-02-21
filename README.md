@@ -67,3 +67,14 @@ new File("${myOutputDir}/env.json").withWriter("UTF-8"){ w->
   new groovy.json.JsonBuilder( env ).writeTo( w )
 }
 ```
+
+### building from source
+
+use java7+ and maven 3+
+
+command to build:
+```
+mvn clean package
+```
+
+
