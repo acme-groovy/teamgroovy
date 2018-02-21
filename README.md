@@ -22,7 +22,7 @@ For more info see: https://confluence.jetbrains.com/display/TCD10/Installing+Add
 
 ### screenshot
 
-TODO
+![screenshot](https://raw.githubusercontent.com/dlukyanov/teamgroovy/master/assets/teamgroovy.png)
 
 ### variables
 
