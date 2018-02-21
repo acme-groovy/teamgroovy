@@ -34,8 +34,8 @@
 			<span class="inline">system properties</span></li>
 		<li><code style="font-weight: bold;">env</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
 			<span class="inline">environment variables</span></li>
-		<li><code style="font-weight: bold;">configParams</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
-			<span class="inline">configuration parameters</span></li>
+		<li><code style="font-weight: bold;">config</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
+			<span class="inline">configuration parameters: <code>config['teamcity.build.workingDir']</code> will return current work dir</span></li>
 		<li><code style="font-weight: bold;">params</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
 			<span class="inline">all parameters</span></li>
 		<li><code style="font-weight: bold;">log</code> ( <a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildProgressLogger.html">BuildProgressLogger</a> ) -

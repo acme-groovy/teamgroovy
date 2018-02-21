@@ -36,6 +36,7 @@ import org.apache.tools.ant.DefaultLogger;
 
 import java.util.List;
 import java.io.PrintStream;
+import java.util.Map;
 
 import java.util.concurrent.*;
 
@@ -114,13 +115,16 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 		try {
 			PrintStream out = new PrintStream( new LogStream(agent.getBuildLogger(), LogStream.LEVEL_INFO), true, "UTF-8" );
 			PrintStream err = new PrintStream( new LogStream(agent.getBuildLogger(), LogStream.LEVEL_ERR),  true, "UTF-8" );
-		
+			/*
+			Map<String,Object> teamcity = (Map)Configs.propsToTreeMap( context.getConfigParameters(), "^teamcity\\\\..*" ).get("teamcity");
+			if(teamcity==null)teamcity=new ConcurrentSkipListMap();
+		    */
 			Binding binding = new Binding();
 			binding.setProperty("system", context.getBuildParameters().getSystemProperties());
 			binding.setProperty("env", context.getBuildParameters().getEnvironmentVariables());
 			binding.setProperty("params", context.getBuildParameters().getAllParameters());
 			binding.setProperty("agent", agent);
-			binding.setProperty("configParams", context.getConfigParameters());
+			binding.setProperty("config", context.getConfigParameters());
 			binding.setProperty("log", agent.getBuildLogger());
 			binding.setProperty("context", context);
 			binding.setProperty("out", out);
