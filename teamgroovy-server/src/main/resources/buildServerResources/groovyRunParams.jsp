@@ -24,77 +24,46 @@
 </tr>
 <tr class="advancedSetting">
   <th>
-    <label>variables available <br/>in script:</label>
+    <label>variables available in script:</label>
   </th>
   <td>
-  	<table border="0">
-  		<tr>
-  		<th>name</th><th>type</th><th>comment</th>
-  		</tr>
-  		<tr>
-			<td>system</td>
-			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a></td>
-			<td>system properties</td>
-  		</tr>
-  		<tr>
-			<td>env</td>
-			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a></td>
-			<td>environment variables</td>
-  		</tr>
-  		<tr>
-			<td>configParams</td>
-			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a></td>
-			<td>configuration parameters</td>
-  		</tr>
-  		<tr>
-			<td>params</td>
-			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">java.util.Map</a></td>
-			<td>all parameters</td>
-  		</tr>
-  		<tr>
-			<td>log</td>
-			<td><a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildProgressLogger.html">jetbrains.buildServer.agent.BuildProgressLogger</a></td>
-			<td>build step logger</td>
-  		</tr>
-  		<tr>
-			<td>agent</td>
-			<td><a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/AgentRunningBuild.html">jetbrains.buildServer.agent.AgentRunningBuild</a></td>
-			<td>Represents running build on the agent side</td>
-  		</tr>
-  		<tr>
-			<td>context</td>
-			<td><a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildRunnerContext.html">jetbrains.buildServer.agent.BuildRunnerContext</a></td>
-			<td>Represents current build runner.</td>
-  		</tr>
-  		<tr>
-			<td>out</td>
-			<td><a href="https://docs.oracle.com/javase/7/docs/api/java/io/PrintStream.html">java.io.PrintStream</a></td>
-			<td>The printstream that redirects output to teamcity build logger. Allows usage of <code>println</code> groovy method.</td>
-  		</tr>
-  		<tr>
-			<td>ant</td>
-			<td><a href="http://docs.groovy-lang.org/latest/html/documentation/ant-builder.html">groovy.util.AntBuilder</a></td>
-			<td>AntBuilder with output redirected to teamcity build logger</td>
-  		</tr>
-  	</table>
+  	<ul>
+		<li><code style="font-weight: bold;">ant</code> ( <a href="http://docs.groovy-lang.org/latest/html/documentation/ant-builder.html">AntBuilder</a> ) -
+			<span class="inline">AntBuilder with output redirected to teamcity build logger</span></li>
+		<li><code style="font-weight: bold;">system</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
+			<span class="inline">system properties</span></li>
+		<li><code style="font-weight: bold;">env</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
+			<span class="inline">environment variables</span></li>
+		<li><code style="font-weight: bold;">configParams</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
+			<span class="inline">configuration parameters</span></li>
+		<li><code style="font-weight: bold;">params</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
+			<span class="inline">all parameters</span></li>
+		<li><code style="font-weight: bold;">log</code> ( <a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildProgressLogger.html">BuildProgressLogger</a> ) -
+			<span class="inline">build step logger</span></li>
+		<li><code style="font-weight: bold;">agent</code> ( <a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/AgentRunningBuild.html">AgentRunningBuild</a> ) -
+			<span class="inline">Represents running build on the agent side</span></li>
+		<li><code style="font-weight: bold;">context</code> ( <a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildRunnerContext.html">BuildRunnerContext</a> ) -
+			<span class="inline">Represents current build runner.</span></li>
+		<li><code style="font-weight: bold;">out</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/io/PrintStream.html">PrintStream</a> ) -
+			<span class="inline">The printstream that redirects output to teamcity build logger. Allows usage of <code style="font-weight: bold;">println</code> groovy method.</span></li>
+	</ul>
   </td>
 </tr>
 
 <script>
-    $j.getScript("${teamcityPluginResourcesPath}codemirror.js")
-    .done(function () {
-    	console.log("${teamcityPluginResourcesPath}groovy.js");
-        return $j.getScript("${teamcityPluginResourcesPath}groovy.js");
-    })
-    .done(function () {
-        var textarea = $("scriptBody");
-        var myCodeMirror = CodeMirror.fromTextArea(textarea, {
-            lineNumbers: true,
-            matchBrackets: true,
-            mode: "groovy"
-        });
-        myCodeMirror.on("change", function (cm) {
-            textarea.value = cm.getValue();
-        });
-    });
+	$j.getScript("${teamcityPluginResourcesPath}codemirror.js")
+		.then(function () {
+			return $j.getScript("${teamcityPluginResourcesPath}groovy.js");
+		})
+		.then(function () {
+			var textarea = $("scriptBody");
+			var myCodeMirror = CodeMirror.fromTextArea(textarea, {
+				lineNumbers: true,
+				matchBrackets: true,
+				mode: "groovy"
+			});
+			myCodeMirror.on("change", function (cm) {
+				textarea.value = cm.getValue();
+			});
+		});
 </script>
