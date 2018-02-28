@@ -68,7 +68,7 @@ class Utils{
 
 and it's located in folder `/git/teamgroovy/mypackage/Utils.groovy`
 
-then in parameter `Script classpath` you should specify `/git/teamgroovy`
+then in the build step parameter `Script classpath` you should specify `/git/teamgroovy`
 
 and in the script body of your build step you can call this class:
 
@@ -77,6 +77,10 @@ import mypackage.Utils
 //print out the env variables to teamcity log
 Utils.print(env, out)
 ```
+
+Groovy script class loader will try to find class `mypackage.Utils` as a file `mypackage/Utils.groovy` in current classpath.
+
+**Note:** `println` in groovy classes will not work unless you pass `out` object from script to class and use `out.println`
 
 ### ant examples
 
