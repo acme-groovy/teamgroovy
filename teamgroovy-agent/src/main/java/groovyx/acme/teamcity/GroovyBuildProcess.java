@@ -23,6 +23,7 @@ import jetbrains.buildServer.agent.BuildProcess;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import org.apache.log4j.Logger;
 
+import groovy.lang.GroovyClassLoader;
 import groovy.lang.Binding;
 import groovy.lang.Script;
 import groovy.util.AntBuilder;
@@ -36,6 +37,7 @@ import org.apache.tools.ant.DefaultLogger;
 
 import java.util.List;
 import java.io.PrintStream;
+import java.io.File;
 import java.util.Map;
 
 import java.util.concurrent.*;
@@ -131,6 +133,18 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 			binding.setProperty("ant", getAntBuilder( out, err ));
 
 			GroovyShell shell = new GroovyShell(binding);
+
+			//add classpath to groovy shell
+			String classpath = context.getRunnerParameters().get("scriptClasspath");
+			if(classpath!=null && classpath.length()>0){
+				GroovyClassLoader cl = shell.getClassLoader();
+				for (String cp : classpath.split(";")) {
+					cp = cp.trim();
+					if( ! new File(cp).exists() )agent.getBuildLogger().warning("path not found: "+cp);
+					cl.addClasspath(cp);
+				}
+			}
+
 			Script script = shell.parse(context.getRunnerParameters().get("scriptBody"));
 			Object result = script.run();
 			agent.getBuildLogger().message("Groovy script: SUCCESS");

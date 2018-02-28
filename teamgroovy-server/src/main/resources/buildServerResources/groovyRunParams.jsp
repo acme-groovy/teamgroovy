@@ -10,6 +10,15 @@
 
 <forms:workingDirectory/>
 
+<tr>
+  <th>
+      <label for="scriptClasspath">Script classpath:</label>
+  </th>
+  <td>
+      <props:textProperty name="scriptClasspath" className="longField" expandable="true"/>
+      <span class="smallNote">Additional semicolon separated classpath. Could contain folders with external groovy classes, so you can use them in this build step.</span>
+  </td>
+</tr>
 <tr id="script.content.container">
   <th>
     <label for="scriptBody">Groovy script: <l:star/></label>

@@ -8,5 +8,8 @@
 <props:viewWorkingDirectory />
 
 <div class="parameter">
+    Script classpath: <strong><props:displayValue name="scriptClasspath" emptyValue=""/></strong>
+</div>
+<div class="parameter">
   Groovy script: <props:displayValue name="scriptBody" emptyValue="<empty>" showInPopup="true" popupTitle="Script body" popupLinkText="view script content"/>
 </div>
