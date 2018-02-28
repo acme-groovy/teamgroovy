@@ -50,6 +50,34 @@ log.error   "hello $name ! from logger in error mode"
 ant.echo( message: "hello $name ! from ant" )
 ```
 
+### script classpath
+
+you can specify where additional groovy classes are located
+
+for example you have class 
+
+```groovy
+package mypackage
+class Utils{
+  /** prints map content to output */
+  public static void print(Map m, PrintStream out){
+    m.each{k,v-> out.println("$k = $v") }
+  }
+}
+```
+
+and it's located in folder `/git/teamgroovy/mypackage/Utils.groovy`
+
+then in parameter `Script classpath` you should specify `/git/teamgroovy`
+
+and in the script body of your build step you can call this class:
+
+```groovy
+import mypackage.Utils
+//print out the env variables to teamcity log
+Utils.print(env, out)
+```
+
 ### ant examples
 
 ```groovy
