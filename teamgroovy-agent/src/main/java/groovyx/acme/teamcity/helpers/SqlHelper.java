@@ -14,10 +14,30 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import java.util.regex.Pattern;
+
 public class SqlHelper implements Driver{
+	private static Pattern goDelim = Pattern.compile("(?i)[\\r\\n]GO[\\r\\n$]");
+	private static Pattern slashDelim = Pattern.compile("(?i)[\\r\\n]/[\\r\\n$]");
+
 	//static Map<long,Object> delegate = new java.util.concurrent.ConcurrentHashMap<>();
 	Driver driver = null;
 	
+	/** splits batch */
+	public static void eachCommand(CharSequence batch, Pattern delim, Closure c) {
+		String ss[] = delim.split(batch);
+		for(String cmd: ss){
+			cmd=cmd.trim();
+			if(cmd.length()>0)c.call(cmd);
+		}
+	}
+	public static void eachGoCommand(CharSequence batch, Closure c) {
+		eachCommand( batch, goDelim, c );
+	}
+	public static void eachSlashCommand(CharSequence batch, Closure c) {
+		eachCommand( batch, slashDelim, c );
+	}
+
 	public static void withInstance(Map<String, Object> args, Closure c) throws Throwable {
 		Object driver = args.get("driver");
 		if(driver==null)throw new RuntimeException("The paramener `driver` is required.");
