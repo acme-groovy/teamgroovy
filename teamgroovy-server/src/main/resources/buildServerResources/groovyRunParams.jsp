@@ -69,6 +69,7 @@
 			var myCodeMirror = CodeMirror.fromTextArea(textarea, {
 				lineNumbers: true,
 				matchBrackets: true,
+				indentWithTabs: true,
 				mode: "groovy"
 			});
 			myCodeMirror.on("change", function (cm) {

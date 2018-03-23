@@ -112,7 +112,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 		return ant;
 	}
 
-
+	static String defaults = "import groovyx.acme.teamcity.helpers.*; ";
 	public BuildFinishedStatus call() {
 		try {
 			PrintStream out = new PrintStream( new LogStream(agent.getBuildLogger(), LogStream.LEVEL_INFO), true, "UTF-8" );
@@ -145,7 +145,8 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 				}
 			}
 
-			Script script = shell.parse(context.getRunnerParameters().get("scriptBody"));
+			Script script = shell.parse(defaults+context.getRunnerParameters().get("scriptBody"));
+			Thread.currentThread().setContextClassLoader( script.getClass().getClassLoader() );
 			Object result = script.run();
 			agent.getBuildLogger().message("Groovy script: SUCCESS");
 		} catch (Throwable e) {
