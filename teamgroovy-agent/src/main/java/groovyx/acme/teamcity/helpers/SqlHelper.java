@@ -2,7 +2,11 @@
 package groovyx.acme.teamcity.helpers;
 
 import groovy.lang.Closure;
+import groovy.lang.Tuple;
+
 import groovy.sql.Sql;
+import groovy.sql.SqlWithParams;
+
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
@@ -12,6 +16,8 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -62,22 +68,26 @@ public class SqlHelper implements Driver{
 
 	public static void withInstance(Map<String, Object> args, Closure c) throws Throwable {
 		Object driver = args.get("driver");
+		String url = (String)args.get("url");
 		if(driver==null)throw new RuntimeException("The paramener `driver` is required.");
+		if(url==null)throw new RuntimeException("The paramener `url` is required.");
 		
 		Sql sql = null;
 		SqlHelper helper = null;
+		Properties props = new Properties();
+		for(Map.Entry<String,Object> e : args.entrySet())
+			if( !"driver".equals(e.getKey()) && !"url".equals(e.getKey()) )
+				props.setProperty(e.getKey(), Cast.asString(e.getValue()));
+		
 		try {
 			if(driver instanceof CharSequence){
 				Class cdriver = Class.forName( ((CharSequence)driver).toString(), true, Thread.currentThread().getContextClassLoader() );
 				driver = cdriver.newInstance();
 			}
-			if(driver instanceof Driver){
-				args = new HashMap(args);
-				args.remove("driver");
-				helper = new SqlHelper((Driver)driver);
-				DriverManager.registerDriver(helper);
-			}
-			sql = Sql.newInstance(args);
+			helper = new SqlHelper((Driver)driver);
+			DriverManager.registerDriver(helper);
+			
+			sql = new WSql( DriverManager.getConnection(url, props) );
 			c.call(sql);
 			if(!sql.getConnection().getAutoCommit())sql.commit();
 		} catch(Throwable t) {
@@ -126,4 +136,25 @@ public class SqlHelper implements Driver{
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException{
 		return this.driver.getParentLogger();
 	}
+	
+	static class WSql extends Sql {
+		public WSql(Connection con){
+			super(con);
+		}
+		@Override
+		public SqlWithParams checkForNamedParams(String sql, List<Object> params) {
+			SqlWithParams preCheck = buildSqlWithIndexedProps(sql);
+			if (preCheck == null) {
+				//the next line is the only change to original groovy code to fix error when sql has no named parameters, but params contains a map
+				if(params.size()==1 && params.get(0) instanceof Map)params=new ArrayList();
+				return new SqlWithParams(sql, params);
+			}
+
+			List<Tuple> indexPropList = new ArrayList<Tuple>();
+			for (Object next : preCheck.getParams()) {
+				indexPropList.add((Tuple) next);
+			}
+			return new SqlWithParams(preCheck.getSql(), getUpdatedParams(params, indexPropList));
+		}
+	}	
 }
