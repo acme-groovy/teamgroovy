@@ -18,27 +18,27 @@ import org.codehaus.groovy.runtime.MethodClosure;
 import java.nio.CharBuffer;
 
 /**
- * Reader-based groovy-like template that supports <% %> tags for code and <%= xxx %> as value injection
+ * Groovy language based template that supports <% %> tags for code and <%= xxx %> as value injection
  * The main diff from standard groovy templates: no support of `${}` expressions, keeps original new line chars (\n \r or \r\n),
  * could write huge and binary outputs. however the source must small enough to be able converted to code.
  * usage:
  * def tpl = new StreamingTemplate(" myParm1 = <%=myParm1%>; myParm2 = <%=myParm2%>")
  * tpl.make( out: new File("out1").newWriter(), myParm1: 111, myParm2:'sss' )
- * tpl.make( out: new File("out2").newWriter(), myParm1: 222, myParm2:'ddd' )
+ * tpl.make( out: new PrintStream(new File("out2")), myParm1: 222, myParm2:'ddd' )
  */
-public class StreamingTemplate {
+public class GSPTemplate { //extends TemplateEngine {
     //protected static final String className = FileTemplate.class.getName();
     
     CharBuffer template;
     String scriptText;
     //String encoding = "UTF-8";
     
-    public StreamingTemplate(CharSequence cc)throws IOException {
+    public GSPTemplate(CharSequence cc)throws IOException {
         this.template = CharBuffer.wrap(cc);
         scriptText = this.parse();
     }
     
-    public StreamingTemplate(Reader r)throws IOException {
+    public GSPTemplate(Reader r)throws IOException {
         this( Cast.asString(r) );
     }
     
@@ -57,7 +57,7 @@ public class StreamingTemplate {
         bindMap.put("template", template);
         bindMap.put("write", new MethodClosure(this,"write")); //this.&write;
         
-        Script script = new GroovyShell().parse( scriptText , "StreamingTemplate_" + Long.toHexString(template.hashCode()) + ".groovy");
+        Script script = new GroovyShell().parse( scriptText , "GSPTemplate_" + Long.toHexString(template.hashCode()) + ".groovy");
         script.setBinding( new Binding(bindMap) );
         //try {
             script.run();
