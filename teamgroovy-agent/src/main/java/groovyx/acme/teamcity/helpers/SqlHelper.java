@@ -50,13 +50,13 @@ public class SqlHelper implements Driver{
 	
 	/** splits resource stream, file or reader to commands with `GO` delimiter line and calls closure for each command.
 	 */
-	public static void eachGoCommand(CharSequence batch, Closure c)  throws IOException {
+	public static void eachGoCommand(Object batch, Closure c)  throws IOException {
 		eachCommand( batch, goDelim, c );
 	}
 	
 	/** splits resource stream, file or reader to commands with `/` delimiter line and calls closure for each command.
 	 */
-	public static void eachSlashCommand(CharSequence batch, Closure c) throws IOException {
+	public static void eachSlashCommand(Object batch, Closure c) throws IOException {
 		eachCommand( batch, slashDelim, c );
 	}
 
