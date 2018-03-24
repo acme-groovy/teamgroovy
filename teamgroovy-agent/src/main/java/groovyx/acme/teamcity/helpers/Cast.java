@@ -4,6 +4,7 @@ import groovy.lang.Closure;
 import groovy.lang.GString;
 import java.io.File;
 import java.io.Reader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -17,8 +18,9 @@ import java.nio.charset.Charset;
 public class Cast{
 	static final String defaultEncoding = "UTF-8";
 
-	/** converts object to string. or reads a resource as string if it's file,stream or reader.
-	  * for closures evaluates them and tries to cast result to string
+	/** casts object to string. reads a resource as string when it's a file, url, stream or reader.
+	  * uses utf-8 encoding when it's unknown.
+	  * for closures evaluates them and tries to cast result to string.
 	  */
 	public static String asString(Object o) throws IOException{
 		if(o==null){
@@ -39,21 +41,27 @@ public class Cast{
 		return o.toString();
 	}
 	
-	public static Reader asReader(Object o) throws IOException{
+	/** casts object to a BufferedReader. file, url, or stream converts to reader.
+	  * uses utf-8 encoding when it's unknown.
+	  * for closures evaluates them and tries to cast result to reader.
+	  */
+	public static BufferedReader asReader(Object o) throws IOException{
 		if(o==null){
-			return new StringReader("");
+			return asReader(new StringReader(""));
 		}else if(o instanceof String){
-			return new StringReader((String)o);
+			return asReader(new StringReader((String)o));
 		}else if(o instanceof GString){
-			return new StringReader(((GString)o).toString());
+			return asReader(new StringReader(((GString)o).toString()));
 		}else if(o instanceof Closure){
 			return asReader(((Closure)o).call());
 		}else if(o instanceof File){
 			return ResourceGroovyMethods.newReader((File)o,defaultEncoding);
 		}else if(o instanceof URL){
 			return ResourceGroovyMethods.newReader((URL)o);
+		}else if(o instanceof BufferedReader){
+			return (BufferedReader)o;
 		}else if(o instanceof Reader){
-			return (Reader)o;
+			return new BufferedReader((Reader)o);
 		}else if(o instanceof InputStream){
 			return IOGroovyMethods.newReader((InputStream)o,defaultEncoding);
 		}
