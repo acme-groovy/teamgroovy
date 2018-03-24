@@ -10,7 +10,7 @@ public class Templates{
 	/** runs template */
 	public static String make(Map binding, Object tpl) throws ClassNotFoundException, java.io.IOException{
 		return new SimpleTemplateEngine()
-			.createTemplate( Strings.asString(tpl) )
+			.createTemplate( Cast.asReader(tpl) )
 			.make(binding)
 			.toString();
 	}
