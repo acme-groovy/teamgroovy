@@ -68,7 +68,7 @@ public class SqlHelper implements Driver{
 
 	public static void withInstance(Map<String, Object> args, Closure c) throws Throwable {
 		Object driver = args.get("driver");
-		String url = (String)args.get("url");
+		String url = Cast.asString(args.get("url"));
 		if(driver==null)throw new RuntimeException("The paramener `driver` is required.");
 		if(url==null)throw new RuntimeException("The paramener `url` is required.");
 		
