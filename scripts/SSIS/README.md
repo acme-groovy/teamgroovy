@@ -10,7 +10,7 @@ class dedicated to be used from teamcity from `groovy script (teamgroovy)` build
 
 there are problems with building/deploying ispac using MSBuild 
 
-also ssis projects are changed a lot by microsoft, so using groovy that you can easily modify without compilation is a goot solution (maybe:).
+also ssis projects are changed a lot by microsoft, so using groovy that you can easily modify without compilation is a good solution (maybe:)
 
 ## assumptions
 
