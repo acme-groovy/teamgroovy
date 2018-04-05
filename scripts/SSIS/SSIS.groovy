@@ -1,6 +1,11 @@
 /*  ssis deployer */
+
+//the following three lines with grab definition for jdbc driver better to move on the level of teamcity script
+//@GrabConfig(initContextClassLoader=true)  //use this one when using this class directly from teamcity
 @GrabConfig(systemClassLoader=true)
 @Grab(group="net.sourceforge.jtds", module="jtds", version="1.3.1")
+
+//
 @Grab(group="commons-io", module="commons-io", version="2.6")
 
 import org.apache.commons.io.input.BOMInputStream; //to remove BOM mark from packages
@@ -12,7 +17,7 @@ import groovy.xml.XmlUtil;
 /**class to build and deploy ssis project (dtproj) through ispac package */
 public class SSIS {
 	private static void help(){
-		println """
+		println '''
 			usage: groovy SSIS.groovy <mode> <path_to_json_conf> <path_to_ispac>
 				where 
 					mode: 
@@ -38,7 +43,7 @@ public class SSIS {
 							"ispac" :"./StageSSIS/bin/StageSSIS.ispac",
 							"projName":"by default name of ispac file"
 						}
-			""".stripIndent()
+			'''.stripIndent()
 	}
 	//no validation yet but could be
 	//just init some defalt values
@@ -76,7 +81,6 @@ public class SSIS {
 		println "deploy $ispac"
 		assert ctx.deploy.ssisdb
 		Map conParams =  ctx.deploy.ssisdb
-		if(!conParams.driver)conParams.driver="net.sourceforge.jtds.jdbc.Driver";
 
 		ispac.withInputStream{rawIn->
 			Sql.withInstance(conParams){sql->
