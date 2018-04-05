@@ -23,11 +23,20 @@ for example you have the following folder structure with SSIS project:
 
 ## running from Groovy Script (teamgroovy)
 
+modify the `SSIS.groovy` class:
+
+* remove `@GrabConfig(...)` and `@Grab(group="net.sourceforge.jtds" ....)` lines from it
+
 specify in `Script classpath` the folder where `SSIS.groovy` located (checked out)
 
 and the following code will perform build and deploy
 
 ```groovy
+@GrabConfig(initContextClassLoader=true)
+@Grab(group="net.sourceforge.jtds", module="jtds", version="1.3.1")
+
+import SSIS
+
 def ctx=[
 	"build" :[
 		"dtproj" : "./StageSSIS/StageSSIS.dtproj",
@@ -43,8 +52,8 @@ def ctx=[
 		]
 	]
 ]
-SSIS.buildSSIS(ctx)
-SSIS.deploySSIS(ctx)
+SSIS.buildISPAC(ctx)
+SSIS.deployISPAC(ctx)
 ```
 
 ## running from command line
