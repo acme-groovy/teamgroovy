@@ -104,7 +104,7 @@ public class SSIS {
 		def DTS = new groovy.xml.Namespace("www.microsoft.com/SqlServer/Dts")
 		def projXml=new XmlParser().parse( new File(ctx.build.dtproj) )
 		def manifestXml = projXml.DeploymentModelSpecificContent.Manifest[SSIS.Project][0]
-		def configXml = projXml.Configurations.Configuration.find{it.Name.text()==ctx.build.config}
+		def configXml = projXml.Configurations.Configuration.find{it.Name.text()?.equalsIgnoreCase(ctx.build.config)}
 		assert configXml
 		assert manifestXml
 
@@ -153,8 +153,8 @@ public class SSIS {
 				def pw = conmgrXml[DTS.PropertyExpression].find{it.attributes()[DTS.Name]=="Password"}?.text() ?: ""
 				pw = evalProjParams(pw, params)
 				//modify connection object
-				conmgrXml[DTS.ObjectData][DTS.ConnectionManager][0]?.attributes()?.put(DTS.ConnectionString, cs.collect{k,v->"$k=$v;"}.join(""))
-				conmgrXml[DTS.ObjectData][DTS.ConnectionManager][DTS.Password][0]?.setValue( pw )
+				if(cs)conmgrXml[DTS.ObjectData][DTS.ConnectionManager][0]?.attributes()?.put(DTS.ConnectionString, cs.collect{k,v->"$k=$v;"}.join(""))
+				if(pw)conmgrXml[DTS.ObjectData][DTS.ConnectionManager][DTS.Password][0]?.setValue( pw )
 				//put conmgr into ispac
 				add2zip(zip, conmgr){ XmlUtil.serialize(conmgrXml, it) }
 			}
@@ -198,8 +198,15 @@ public class SSIS {
 		pw.print(x)
 	}
 
-	public static Map parseConnectionString(String s, boolean ext=true){
-		Map m = s.split(';').collectEntries{ (it=~/([^=]+)=(.*)/).find{true}.drop(1) }
+	public static Map parseConnectionString(String s){
+		if(!s)return [:];
+		Map m = s.split(';').collectEntries{a->
+			try{	
+				(a=~/([^=]+)=(.*)/).find{true}.drop(1) 
+			}catch(Throwable t){
+				throw new RuntimeException("Can't parse connection string: `${s}` at `${a}` : ${t}")
+			}
+		}
 		return m
 	}
 
