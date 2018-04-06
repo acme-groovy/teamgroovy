@@ -146,7 +146,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 			}
 
 			Script script = shell.parse(defaults+context.getRunnerParameters().get("scriptBody"));
-			Thread.currentThread().setContextClassLoader( script.getClass().getClassLoader() );
+			Thread.currentThread().setContextClassLoader( shell.getClassLoader() ); //script.getClass().getClassLoader() );
 			Object result = script.run();
 			agent.getBuildLogger().message("Groovy script: SUCCESS");
 		} catch (Throwable e) {

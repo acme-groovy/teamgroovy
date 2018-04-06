@@ -16,6 +16,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.BufferedReader;
@@ -105,6 +106,34 @@ public class SqlHelper implements Driver{
 			if(helper != null)DriverManager.deregisterDriver(helper);
 		}
 	}
+	/** registers wrapped driver if no drivers for url registered. returns driver class name */
+	public static String register(String realDriver, String url)throws SQLException{
+		try {
+			Driver d = DriverManager.getDriver(url);
+			if(d!=null)return d.getClass().getName();
+		} catch(SQLException e) {}
+		try {
+			Class dc = Class.forName( realDriver.toString(), true, Thread.currentThread().getContextClassLoader() );
+			Driver d = (Driver) dc.newInstance();
+			if(!d.acceptsURL(url))throw new RuntimeException( "the url `" + url + "` not accepted by the driver " + realDriver );
+			SqlHelper helper = new SqlHelper(d);
+			DriverManager.registerDriver(helper);
+			return helper.getClass().getName();
+		} catch(Throwable t) {
+			throw new SQLException("Failed to instantiate driver `" + realDriver + "`",t);
+		}
+	}
+	/** registers wrapping driver if required and returns new parameters */
+	public static Map wrap(Map params) throws SQLException {
+		Map m = new LinkedHashMap(params);
+		Object driver = m.remove("driver");
+		Object url = m.get("url");
+		if(driver==null)throw new RuntimeException("The parameter `driver` is required to use wrap.");
+		if(url==null)throw new RuntimeException("The parameter `url` is required to use wrap.");
+		register(driver.toString(), url.toString());
+		return m;
+	}
+
 	public SqlHelper(Driver driver){
 		this.driver = driver;
 	}
