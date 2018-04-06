@@ -1,7 +1,6 @@
 /*  ssis deployer */
 
-//the following three lines with grab definition for jdbc driver better to move on the level of teamcity script
-//@GrabConfig(initContextClassLoader=true)  //use this one when using this class directly from teamcity
+//the following two lines with grab definition for jdbc driver better to move on the level of teamcity script
 @GrabConfig(systemClassLoader=true)
 @Grab(group="net.sourceforge.jtds", module="jtds", version="1.3.1")
 
@@ -74,24 +73,28 @@ public class SSIS {
 			deployISPAC(ctx);
 		}
 	}
-		
+
 	public static void deployISPAC(Map ctx){
 		validateCtx(ctx)
 		File ispac = new File(ctx.ispac)
 		println "deploy $ispac"
 		assert ctx.deploy.ssisdb
-		Map conParams =  ctx.deploy.ssisdb
 
 		ispac.withInputStream{rawIn->
-			Sql.withInstance(conParams){sql->
-				def query = """
-				DECLARE @project_name nvarchar(128) = ${ctx.projName};
-				DECLARE @folder_name nvarchar(128)  = ${ctx.deploy.folder};
-				DECLARE @operation_id bigint        = -1;
-				execute catalog.deploy_project @folder_name, @project_name, ${Sql.BLOB( rawIn.getBytes() )}, @operation_id output;
-				select @operation_id as operation_id;
-				"""
-				println( "  DONE: " + sql.rows( query ) )
+			def query = """
+			DECLARE @project_name nvarchar(128) = ${Sql.VARCHAR(ctx.projName)};
+			DECLARE @folder_name nvarchar(128)  = ${Sql.VARCHAR(ctx.deploy.folder)};
+			DECLARE @operation_id bigint        = -1;
+			execute catalog.deploy_project @folder_name, @project_name, ${Sql.BLOB( rawIn.getBytes() )}, @operation_id output;
+			select @operation_id as operation_id;
+			"""
+			Object ssisdb =  ctx.deploy.ssisdb
+			if(ssisdb instanceof Sql){
+					println( "  DONE: " + ssisdb.rows( query ) )
+			}else{
+				Sql.withInstance((Map)ssisdb){sql->
+					println( "  DONE: " + sql.rows( query ) )
+				}
 			}
 		}
 		

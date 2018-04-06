@@ -32,7 +32,6 @@ specify in `Script classpath` the folder where `SSIS.groovy` located (checked ou
 and the following code will perform build and deploy
 
 ```groovy
-@GrabConfig(initContextClassLoader=true)
 @Grab(group="net.sourceforge.jtds", module="jtds", version="1.3.1")
 
 import SSIS
@@ -44,12 +43,12 @@ def ctx=[
 	],
 	"deploy":[
 		"folder":"Stage",
-		"ssisdb": [
+		"ssisdb": SqlHelper.wrap([
 			"driver"  :"net.sourceforge.jtds.jdbc.Driver",
 			"url"     : "jdbc:jtds:sqlserver://dev1-sql:1433/SSISDB;useNTLMv2=true;domain=MYDOM",
 			"user"    : "teamcity",
 			"password": "xyz"
-		]
+		])
 	]
 ]
 SSIS.buildISPAC(ctx)
