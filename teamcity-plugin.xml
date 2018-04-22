@@ -2,15 +2,15 @@
 <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
   <info>
     <name>teamgroovy</name>
-    <display-name>teamgroovy</display-name>
+    <display-name>Groovy script (teamgroovy)</display-name>
     <version>@Version@</version>
     <description>Groovy script as a build step (teamgroovy)</description>
-    <download-url>https://github.com/dlukyanov/teamgroovy/releases</download-url>
+    <download-url>https://github.com/acme-groovy/teamgroovy/releases</download-url>
     <email>dlukyanov@ukr.net</email>
     <vendor>
-      <name>github.com/dlukyanov</name>
-      <url>https://github.com/dlukyanov/teamgroovy/releases</url>
-      <logo>Plugin vendor logo URL</logo>
+      <name>github.com/acme-groovy</name>
+      <url>https://github.com/acme-groovy/teamgroovy/releases</url>
+      <logo>https://avatars2.githubusercontent.com/u/36738546</logo>
     </vendor>
   </info>
   <deployment use-separate-classloader="true" />
