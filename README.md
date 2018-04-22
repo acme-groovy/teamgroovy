@@ -5,7 +5,7 @@ forked from https://github.com/melix/teamcity-groovy-buildstep
 
 ### download 
 
-get in [releases the teamgroovy.zip](https://github.com/dlukyanov/teamgroovy/releases)
+get in [releases the teamgroovy.zip](https://github.com/acme-groovy/teamgroovy/releases)
 
 ### install
 
@@ -22,7 +22,7 @@ For more info see: https://confluence.jetbrains.com/display/TCD10/Installing+Add
 
 ### screenshot
 
-![screenshot](https://raw.githubusercontent.com/dlukyanov/teamgroovy/master/assets/teamgroovy.png)
+![screenshot](https://raw.githubusercontent.com/acme-groovy/teamgroovy/master/assets/teamgroovy.png)
 
 ### variables
 
