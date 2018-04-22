@@ -7,6 +7,11 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
 <link rel="stylesheet" href="${teamcityPluginResourcesPath}codemirror.css">
+<style type="text/css">
+.ui-autocomplete {
+	z-index: 99 !important;
+}
+</style>
 
 <forms:workingDirectory/>
 
@@ -39,6 +44,8 @@
   	<ul>
 		<li><code style="font-weight: bold;">ant</code> ( <a href="http://docs.groovy-lang.org/latest/html/documentation/ant-builder.html">AntBuilder</a> ) -
 			<span class="inline">AntBuilder with output redirected to teamcity build logger</span></li>
+		<li><code style="font-weight: bold;">basedir</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html">File</a> ) -
+			<span class="inline">The work directory of the current build. The same as <code>new File(config['teamcity.build.workingDir'])</code></span></li>
 		<li><code style="font-weight: bold;">system</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
 			<span class="inline">system properties</span></li>
 		<li><code style="font-weight: bold;">env</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
@@ -70,7 +77,12 @@
 				lineNumbers: true,
 				matchBrackets: true,
 				indentWithTabs: true,
-				mode: "groovy"
+				indentUnit: 4,
+				tabSize: 4,
+				mode: "text/x-groovy",
+				//code folding
+				foldGutter: true,
+				gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
 			});
 			myCodeMirror.on("change", function (cm) {
 				textarea.value = cm.getValue();

@@ -98,7 +98,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 		}
 	}
 
-	private AntBuilder getAntBuilder(PrintStream out, PrintStream err){
+	private AntBuilder getAntBuilder(File basedir, PrintStream out, PrintStream err){
 		AntBuilder ant = new AntBuilder();
 		//List<BuildListener> listeners = ant.getProject().getBuildListeners();
 		//replace stdout and stderr in default ant logger to redirect output to teamcity
@@ -109,6 +109,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 				defLogger.setErrorPrintStream(err);
 			}
 		}
+		ant.getAntProject().setBaseDir(basedir);
 		return ant;
 	}
 
@@ -117,6 +118,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 		try {
 			PrintStream out = new PrintStream( new LogStream(agent.getBuildLogger(), LogStream.LEVEL_INFO), true, "UTF-8" );
 			PrintStream err = new PrintStream( new LogStream(agent.getBuildLogger(), LogStream.LEVEL_ERR),  true, "UTF-8" );
+			File basedir = new File( context.getConfigParameters().get( "teamcity.build.workingDir" ) );
 			/*
 			Map<String,Object> teamcity = (Map)Configs.propsToTreeMap( context.getConfigParameters(), "^teamcity\\\\..*" ).get("teamcity");
 			if(teamcity==null)teamcity=new ConcurrentSkipListMap();
@@ -130,7 +132,8 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 			binding.setProperty("log", agent.getBuildLogger());
 			binding.setProperty("context", context);
 			binding.setProperty("out", out);
-			binding.setProperty("ant", getAntBuilder( out, err ));
+			binding.setProperty("ant", getAntBuilder( basedir, out, err ));
+			binding.setProperty("basedir", basedir);
 
 			GroovyShell shell = new GroovyShell(binding);
 
