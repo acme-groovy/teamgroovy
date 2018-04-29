@@ -1,3 +1,4 @@
+<%@ page import="groovyx.acme.teamcity.Helper" %>
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
@@ -7,6 +8,9 @@
 
 <link rel="stylesheet" href="${teamcityPluginResourcesPath}codemirror/lib/codemirror.css"/>
 <link rel="stylesheet" href="${teamcityPluginResourcesPath}codemirror/addon/fold/foldgutter.css"/>
+<link rel="stylesheet" href="${teamcityPluginResourcesPath}codemirror/theme/neat.css"/>
+<link rel="stylesheet" href="${teamcityPluginResourcesPath}codemirror/addon/hint/show-hint.css"/>
+
 <style type="text/css">
 	.ui-autocomplete {
 		z-index: 99 !important;
@@ -19,16 +23,23 @@
 </style>
 
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/lib/codemirror.js" ></script>
+<script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/edit/matchbrackets.js"></script>
+<script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/selection/active-line.js"></script>
 
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/foldcode.js"></script>
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/foldgutter.js"></script>
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/brace-fold.js"></script>
-<script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/comment-fold.js"></script>
+<!--script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/comment-fold.js"></script-->
+<script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/hint/show-hint.js"></script>
+<script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/hint/my-hint.js"></script>
 
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/mode/groovy/groovy.js" ></script>
 
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+<!--jsp:useBean id="buildType"      scope="request" type="jetbrains.buildServer.serverSide.SBuildType"/-->
+<!--jsp:useBean id="runBuildBean" type="jetbrains.buildServer.controllers.RunBuildBean" scope="request"/-->
+<!--jsp:useBean id="params"         scope="request" type="jetbrains.buildServer.controllers.RunBuildParameters"/-->
 
 <forms:workingDirectory/>
 
@@ -68,7 +79,7 @@
 		<li><code style="font-weight: bold;">env</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
 			<span class="inline">environment variables</span></li>
 		<li><code style="font-weight: bold;">config</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
-			<span class="inline">configuration parameters: <code>config['teamcity.build.workingDir']</code> will return current work dir</span></li>
+			<span class="inline">configuration parameters: <code>config.'teamcity.build.workingDir'</code> will return current work dir</span></li>
 		<li><code style="font-weight: bold;">params</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
 			<span class="inline">all parameters</span></li>
 		<li><code style="font-weight: bold;">log</code> ( <a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildProgressLogger.html">BuildProgressLogger</a> ) -
@@ -88,21 +99,31 @@
 		var textarea = $("scriptBody");
 		var myCodeMirror = CodeMirror.fromTextArea(textarea, {
 			lineNumbers: true,
+			styleActiveLine: true,
+			theme:"neat",
 			matchBrackets: true,
 			indentWithTabs: true,
 			indentUnit: 4,
 			tabSize: 4,
 			mode: "groovy",
 			//code folding
-			extraKeys: {"Ctrl-Q": function(cm) { cm.foldCode(cm.getCursor()); }},
 			foldGutter: true,
-			gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+			gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+			//hint
+			extraKeys: {"Ctrl-Space": "autocomplete"},
+			myHint: {
+				validChars: /[\w\.']+/ ,
+				splitDelim: /\./ ,
+				properties: <%= Helper.paramsAsJson( pageContext ) %>
+			}
 		});
 		//
 		myCodeMirror.on("change", function (cm) {
 			textarea.value = cm.getValue();
 		});
 	});
+	
+	
 </script>
 
 

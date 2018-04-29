@@ -1,0 +1,72 @@
+<!doctype html>
+
+<title>Autocomplete Demo</title>
+<meta charset="utf-8"/>
+
+<link rel="stylesheet" href="../lib/codemirror.css">
+<link rel="stylesheet" href="../theme/neat.css">
+<link rel="stylesheet" href="../addon/hint/show-hint.css">
+<script src="../lib/codemirror.js"></script>
+<script src="../addon/edit/matchbrackets.js"></script>
+<script src="../addon/selection/active-line.js"></script>
+<!--script src="../addon/edit/closebrackets.js"></script-->
+<script src="../addon/hint/show-hint.js"></script>
+<script src="../addon/hint/my-hint.js"></script>
+<script src="../mode/groovy/groovy.js"></script>
+<script src="../mode/javascript/javascript.js"></script>
+
+<form><textarea id="code" name="code">
+def getCompletions(token, context) {
+  def found = [];
+  def maybeAdd(str) {
+    if (str.indexOf(start) == 0) found.push(str);
+  }
+  return found;
+}
+</textarea></form>
+
+<script>
+var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+  lineNumbers: true,
+  extraKeys: {"Ctrl-Space": "autocomplete"},
+  styleActiveLine: true,
+  matchBrackets: true,
+  theme:"neat",
+  mode: {name: "groovy"},
+  //mode: {name: "groovy"}
+  myHint: {
+  	validChars: /[\w\.']+/ ,
+  	splitDelim: /\./ ,
+  	properties: [
+  	"env.tc_my1",
+  	"env.tc_my13",
+  	"env.tc_my3",
+  	"env.tc_go",
+  	"env.tc_goo",
+	"system.'teamcity.booo.fooo'",
+	"system.'teamcity.booo.fooo1'",
+	"system.'teamcity.fooo'"
+    ]
+  }
+
+});
+/*
+CodeMirror.registerHelper("hintWords", "groovy",   [
+  	"'tc_my1'",
+  	"'tc_my2'",
+  	"'tc_g.o'",
+  	"'tc_g.o2'",
+  	"'tc_gooo'"
+  ]
+);
+*/
+/*
+editor.on("beforeChange", function(cm,data) {
+  console.log("--------------beforeChange");
+  console.log(cm);
+  console.log(data);
+});
+*/
+
+</script>
+
