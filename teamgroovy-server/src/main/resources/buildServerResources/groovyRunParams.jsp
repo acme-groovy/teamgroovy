@@ -20,6 +20,15 @@
 		padding-left: 1.28571429em;
 		text-indent: -1.28571429em;
 	}
+	
+	.CodeMirror-hint {
+	  overflow: hidden !important;
+	}
+
+	li.CodeMirror-hint-active {
+	  overflow: hidden !important;
+	}
+	
 </style>
 
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/lib/codemirror.js" ></script>
@@ -57,7 +66,10 @@
     <label for="scriptBody">Groovy script: <l:star/></label>
   </th>
   <td>
-    <span class="smallNote">A Groovy script which will be executed on the build agent. Note: use <code>basedir</code> variable to access current work directory</span>
+    <span class="smallNote">A Groovy script which will be executed on the build agent. 
+    Note: use <code>basedir</code> variable to access current work directory. <br/>
+    Press <code>Ctrl+Space</code> to activate build parameters helper.
+    </span>
       <div class="postRel">
         <textarea id="scriptBody" name="prop:scriptBody">${propertiesBean.properties['scriptBody']}</textarea>
       </div>

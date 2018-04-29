@@ -35,6 +35,10 @@ For more info see: https://confluence.jetbrains.com/display/TCD10/Installing+Add
 * `context` : the build execution context (type: `jetbrains.buildServer.agent.BuildRunnerContext`)
 * `log`: build runner logger (type: `jetbrains.buildServer.agent.BuildProgressLogger`)
 
+### build parameters helper
+
+![parameters](https://raw.githubusercontent.com/acme-groovy/teamgroovy/master/assets/teamgroovy-params.png)
+
 ### logging
 
 For messages to appear into the build log, you can use `println` groovy function or `log` variable:

@@ -35,15 +35,13 @@ public class Helper {
 	private static String normalizeName(String name){
 		if(name==null)return null;
 		String prefix = null;
-		if( name.startsWith("env.") || name.startsWith("system.") ){
-			int pos = name.indexOf('.');
-			if(pos>0){
-				prefix = name.substring(0,pos);
-				name = name.substring(pos+1);
-			}
-		}else{
-			prefix = "config";
+		
+		int pos = name.indexOf('.');
+		if(pos>0){
+			prefix = name.substring(0,pos);
+			name = name.substring(pos+1);
 		}
+		
 		if(prefix!=null && name.matches("^[^\'\"]+$")){
 			if( name.matches("^[a-zA-Z_][a-zA-Z_0-9]*$") ){
 				return prefix + "." + name;
@@ -54,11 +52,18 @@ public class Helper {
 		return null;
 	}
 	
+	private static String normalizePfx(String name){
+		if( !name.startsWith("env.") && !name.startsWith("system.") ){
+			return "config."+name;
+		}
+		return name;
+	}
+	
 	public static String paramsAsJson(SBuildType buildType){
 		TreeSet<String> list = new TreeSet();
 		
-		for(Parameter p : buildType.getParametersCollection())                 { list.add(p.getName()); }
-		for(String p    : buildType.getParametersProvider().getAll().keySet()) { list.add(p); }
+		for(Parameter p : buildType.getParametersCollection())                 { list.add( normalizePfx(p.getName()) ); }
+		for(String p    : buildType.getParametersProvider().getAll().keySet()) { list.add( normalizePfx(p) ); }
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append('[');
