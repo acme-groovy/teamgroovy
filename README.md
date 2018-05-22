@@ -29,7 +29,6 @@ For more info see: https://confluence.jetbrains.com/display/TCD10/Installing+Add
 * `ant` : the groovy ant builder (type `groovy.util.AntBuilder`)
 * `env` : environment variables (type `Map`)
 * `system` : system properties (type `Map`)
-* `params` : all build parameters (type `Map`)
 * `config` : configuration parameters: <code>config['teamcity.build.workingDir']</code> will return current work dir (type `Map`)
 * `agent`: the build agent (type `jetbrains.buildServer.agent.AgentRunningBuild`)
 * `context` : the build execution context (type: `jetbrains.buildServer.agent.BuildRunnerContext`)

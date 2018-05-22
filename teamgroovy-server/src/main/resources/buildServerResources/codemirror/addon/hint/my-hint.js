@@ -12,8 +12,9 @@
 	"use strict";
 	function containsAll(str,strarr){
 		if(strarr){
+			str = str.toLowerCase();
 			for(var i=0;i<strarr.length;i++){
-				if(str.indexOf( strarr[i] )==-1){
+				if(str.indexOf( strarr[i].toLowerCase() )==-1){
 					return false;
 				}
 			}

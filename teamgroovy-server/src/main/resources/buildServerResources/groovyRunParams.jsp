@@ -83,19 +83,20 @@
   <td>
   	<ul class="gdoc">
 		<li><code style="font-weight: bold;">ant</code> ( <a href="http://docs.groovy-lang.org/latest/html/documentation/ant-builder.html">AntBuilder</a> ) -
-			<span class="inline">AntBuilder with output redirected to current build log and with <code>basedir</code> equals to working directory.</span></li>
+			<span class="inline">AntBuilder with output redirected to current build log and with <code>basedir</code> that equals to working directory.</span></li>
 		<li><code style="font-weight: bold;">basedir</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html">File</a> ) -
 			<span class="inline">The current working directory. Equals to <code>new File(config.'teamcity.build.workingDir')</code></span></li>
 		<li><code style="font-weight: bold;">system</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
-			<span class="inline">system properties</span></li>
+			<span class="inline">system properties. Equals to <code>context.getBuildParameters().getSystemProperties()</code></span></li>
 		<li><code style="font-weight: bold;">env</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
-			<span class="inline">environment variables</span></li>
+			<span class="inline">environment variables. Equals to <code>context.getBuildParameters().getEnvironmentVariables()</code></span></li>
 		<li><code style="font-weight: bold;">config</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
-			<span class="inline">configuration parameters: <code>config.'teamcity.build.workingDir'</code> will return current work dir</span></li>
-		<li><code style="font-weight: bold;">params</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
-			<span class="inline">all parameters</span></li>
+			<span class="inline">configuration parameters. Equals to <code>context.getConfigParameters()</code></span></li>
+		<!--deprecated?-->
+		<!--li><code style="font-weight: bold;">params</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a> ) -
+			<span class="inline">all parameters. Equals to <code>context.getBuildParameters().getAllParameters()</code></span></li-->
 		<li><code style="font-weight: bold;">log</code> ( <a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildProgressLogger.html">BuildProgressLogger</a> ) -
-			<span class="inline">build step logger</span></li>
+			<span class="inline">build step logger. Equals to <code>agent.getBuildLogger()</code></span></li>
 		<li><code style="font-weight: bold;">agent</code> ( <a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/AgentRunningBuild.html">AgentRunningBuild</a> ) -
 			<span class="inline">Represents running build on the agent side</span></li>
 		<li><code style="font-weight: bold;">context</code> ( <a href="http://javadoc.jetbrains.net/teamcity/openapi/current/jetbrains/buildServer/agent/BuildRunnerContext.html">BuildRunnerContext</a> ) -
@@ -133,6 +134,7 @@
 		myCodeMirror.on("change", function (cm) {
 			textarea.value = cm.getValue();
 		});
+		console.log("teamgroovy init complete.");
 	});
 	
 	

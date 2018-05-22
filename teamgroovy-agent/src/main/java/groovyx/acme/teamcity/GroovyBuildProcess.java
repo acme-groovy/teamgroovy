@@ -143,8 +143,10 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 				GroovyClassLoader cl = shell.getClassLoader();
 				for (String cp : classpath.split(";")) {
 					cp = cp.trim();
-					if( ! new File(cp).exists() )agent.getBuildLogger().warning("path not found: "+cp);
-					cl.addClasspath(cp);
+					File fcp = new File(cp);
+					if(!fcp.isAbsolute())fcp = new File( basedir, cp );
+					if( ! fcp.exists() )agent.getBuildLogger().warning("path not found: "+fcp);
+					cl.addClasspath(fcp.toString());
 				}
 			}
 
