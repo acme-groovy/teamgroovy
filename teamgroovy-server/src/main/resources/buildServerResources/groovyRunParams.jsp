@@ -30,20 +30,17 @@
 	}
 	
 </style>
-
+<!--
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/lib/codemirror.js" ></script>
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/edit/matchbrackets.js"></script>
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/selection/active-line.js"></script>
-
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/foldcode.js"></script>
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/foldgutter.js"></script>
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/brace-fold.js"></script>
-<!--script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/fold/comment-fold.js"></script-->
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/hint/show-hint.js"></script>
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/addon/hint/my-hint.js"></script>
-
 <script type="text/javascript" src="${teamcityPluginResourcesPath}codemirror/mode/groovy/groovy.js" ></script>
-
+-->
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <!--jsp:useBean id="buildType"      scope="request" type="jetbrains.buildServer.serverSide.SBuildType"/-->
@@ -106,38 +103,54 @@
 	</ul>
   </td>
 </tr>
-
+<!-- teamgroovy script start -->
 <script>
-	$j(document).ready(function () {
-		var textarea = $("scriptBody");
-		var myCodeMirror = CodeMirror.fromTextArea(textarea, {
-			lineNumbers: true,
-			styleActiveLine: true,
-			theme:"neat",
-			matchBrackets: true,
-			indentWithTabs: true,
-			indentUnit: 4,
-			tabSize: 4,
-			mode: "groovy",
-			//code folding
-			foldGutter: true,
-			gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-			//hint
-			extraKeys: {"Ctrl-Space": "autocomplete"},
-			myHint: {
-				validChars: /[\w\.']+/ ,
-				splitDelim: /\./ ,
-				properties: <%= Helper.paramsAsJson( pageContext ) %>
-			}
+	//use dynamic script loading for `Add New Build Step` button support
+	$j
+		.getScript("${teamcityPluginResourcesPath}codemirror/lib/codemirror.js")
+		.then(function () { return $j.getScript("${teamcityPluginResourcesPath}codemirror/addon/edit/matchbrackets.js"); })
+		.then(function () { return $j.getScript("${teamcityPluginResourcesPath}codemirror/addon/selection/active-line.js"); })
+		.then(function () { return $j.getScript("${teamcityPluginResourcesPath}codemirror/addon/fold/foldcode.js"); })
+		.then(function () { return $j.getScript("${teamcityPluginResourcesPath}codemirror/addon/fold/foldgutter.js"); })
+		.then(function () { return $j.getScript("${teamcityPluginResourcesPath}codemirror/addon/fold/brace-fold.js"); })
+		.then(function () { return $j.getScript("${teamcityPluginResourcesPath}codemirror/addon/hint/show-hint.js"); })
+		.then(function () { return $j.getScript("${teamcityPluginResourcesPath}codemirror/addon/hint/my-hint.js"); })
+		.then(function () { return $j.getScript("${teamcityPluginResourcesPath}codemirror/mode/groovy/groovy.js"); })
+		.then(function () {
+			var textarea = $("scriptBody");
+			var myCodeMirror = CodeMirror.fromTextArea(textarea, {
+				lineNumbers: true,
+				styleActiveLine: true,
+				theme:"neat",
+				matchBrackets: true,
+				indentWithTabs: true,
+				indentUnit: 4,
+				tabSize: 4,
+				mode: "groovy",
+				//code folding
+				foldGutter: true,
+				gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+				//hint
+				extraKeys: {"Ctrl-Space": "autocomplete"},
+				myHint: {
+					validChars: /[\w\.']+/ ,
+					splitDelim: /\./ ,
+					properties: <%= Helper.paramsAsJson( pageContext ) %>
+				}
+			});
+			//
+			myCodeMirror.on("change", function (cm) {
+				textarea.value = cm.getValue();
+			});
+			console.log("teamgroovy init complete.");
 		});
-		//
-		myCodeMirror.on("change", function (cm) {
-			textarea.value = cm.getValue();
-		});
-		console.log("teamgroovy init complete.");
-	});
+
+
+	//$j(document).ready(function () {
+	//});
 	
 	
 </script>
+<!-- teamgroovy script end -->
 
 
