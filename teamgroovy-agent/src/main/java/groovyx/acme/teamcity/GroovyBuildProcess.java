@@ -52,7 +52,9 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 
 	private final AgentRunningBuild agent;
 	private final BuildRunnerContext context;
+
 	private Script script = null;
+	private GroovyShell shell = null;
 
 	public GroovyBuildProcess(final AgentRunningBuild agent, final BuildRunnerContext context) {
 		this.agent = agent;
@@ -83,10 +85,11 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 	@Override
 	public void interrupt() {
 		log.info("Interrupting Groovy script");
-		if(script!=null){
+		if(script!=null && shell!=null){
 			Object c = script.getBinding().getVariables().get("onBuildInterrupted");
 			if(c instanceof Closure){
 				try {
+					Thread.currentThread().setContextClassLoader( shell.getClassLoader() ); //script.getClass().getClassLoader() );
 					((Closure)c).call();
 				} catch (Throwable e) {
 					try {
@@ -166,7 +169,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 			binding.setProperty("basedir", basedir);
 			binding.setProperty("onBuildInterrupted", new org.codehaus.groovy.runtime.MethodClosure(this, "onBuildInterrupted") );
 			//assume the separate class loader was set for the plugin, so different instances will/could load different classes with the same name...
-			GroovyShell shell = new GroovyShell(this.getClass().getClassLoader(), binding);
+			this.shell = new GroovyShell(this.getClass().getClassLoader(), binding);
 
 			//add classpath to groovy shell
 			String classpath = context.getRunnerParameters().get("scriptClasspath");
