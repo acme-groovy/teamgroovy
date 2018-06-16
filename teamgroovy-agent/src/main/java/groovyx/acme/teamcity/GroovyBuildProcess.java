@@ -27,6 +27,8 @@ import groovy.lang.GroovyClassLoader;
 import groovy.lang.Binding;
 import groovy.lang.Script;
 import groovy.util.AntBuilder;
+import groovy.lang.Closure;
+import org.codehaus.groovy.runtime.MethodClosure;
 import groovy.lang.GroovyShell;
 import org.codehaus.groovy.runtime.StackTraceUtils;
 
@@ -50,6 +52,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 
 	private final AgentRunningBuild agent;
 	private final BuildRunnerContext context;
+	private Script script = null;
 
 	public GroovyBuildProcess(final AgentRunningBuild agent, final BuildRunnerContext context) {
 		this.agent = agent;
@@ -67,16 +70,39 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 		}
 	}
 
+	@Override
 	public boolean isInterrupted() {
 		return buildStatus.isCancelled() && isFinished();
 	}
 
+	@Override
 	public boolean isFinished() {
 		return buildStatus.isDone();
 	}
 
+	@Override
 	public void interrupt() {
 		log.info("Interrupting Groovy script");
+		if(script!=null){
+			Object c = script.getBinding().getVariables().get("onBuildInterrupted");
+			if(c instanceof Closure){
+				try {
+					((Closure)c).call();
+				} catch (Throwable e) {
+					try {
+						//try to log into build agent logger
+						agent.getBuildLogger().exception( StackTraceUtils.deepSanitize(e) );
+					} catch (Throwable ei) {
+						log.error(e);
+					}
+				}
+			} else {
+				log.debug("The Script.onBuildInterrupted is not a Closure");
+			}
+			
+		} else {
+			log.debug("Script not initialized: null");
+		}
 		buildStatus.cancel(true);
 	}
 
@@ -96,6 +122,10 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 		} finally {
 			executor.shutdown();
 		}
+	}
+
+	private void onBuildInterrupted(){
+		agent.getBuildLogger().message( "interrupting..." );
 	}
 
 	private AntBuilder getAntBuilder(File basedir, PrintStream out, PrintStream err){
@@ -126,7 +156,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 			Binding binding = new Binding();
 			binding.setProperty("system", context.getBuildParameters().getSystemProperties());
 			binding.setProperty("env", context.getBuildParameters().getEnvironmentVariables());
-			binding.setProperty("params", context.getBuildParameters().getAllParameters());
+			//binding.setProperty("params", context.getBuildParameters().getAllParameters());
 			binding.setProperty("agent", agent);
 			binding.setProperty("config", context.getConfigParameters());
 			binding.setProperty("log", agent.getBuildLogger());
@@ -134,8 +164,9 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 			binding.setProperty("out", out);
 			binding.setProperty("ant", getAntBuilder( basedir, out, err ));
 			binding.setProperty("basedir", basedir);
-
-			GroovyShell shell = new GroovyShell(binding);
+			binding.setProperty("onBuildInterrupted", new org.codehaus.groovy.runtime.MethodClosure(this, "onBuildInterrupted") );
+			//assume the separate class loader was set for the plugin, so different instances will/could load different classes with the same name...
+			GroovyShell shell = new GroovyShell(this.getClass().getClassLoader(), binding);
 
 			//add classpath to groovy shell
 			String classpath = context.getRunnerParameters().get("scriptClasspath");
@@ -150,7 +181,7 @@ public class GroovyBuildProcess implements BuildProcess, Callable<BuildFinishedS
 				}
 			}
 
-			Script script = shell.parse(defaults+context.getRunnerParameters().get("scriptBody"));
+			this.script = shell.parse(defaults+context.getRunnerParameters().get("scriptBody"));
 			Thread.currentThread().setContextClassLoader( shell.getClassLoader() ); //script.getClass().getClassLoader() );
 			Object result = script.run();
 			agent.getBuildLogger().message("Groovy script: SUCCESS");

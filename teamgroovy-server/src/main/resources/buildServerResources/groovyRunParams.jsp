@@ -100,6 +100,8 @@
 			<span class="inline">Represents current build runner.</span></li>
 		<li><code style="font-weight: bold;">out</code> ( <a href="https://docs.oracle.com/javase/7/docs/api/java/io/PrintStream.html">PrintStream</a> ) -
 			<span class="inline">The printstream that redirects output to teamcity build logger. Allows usage of <code style="font-weight: bold;">println</code> groovy method.</span></li>
+		<li><code style="font-weight: bold;">onBuildInterrupted</code> ( <a href="http://docs.groovy-lang.org/latest/html/api/groovy/lang/Closure.html">Closure</a> ) -
+			<span class="inline">The closure that will be called when build has been interrupted.<br/> by default <code>onBuildInterrupted = { println 'interrupting...' }</code></span></li>
 	</ul>
   </td>
 </tr>
